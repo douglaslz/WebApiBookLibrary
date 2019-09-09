@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -22,6 +23,20 @@ namespace WebApiBookLibrary.Controllers
         }
 
 
+        //Return first of the table with this url https://localhost:44329/api/Authors/First
+        [HttpGet("First")]
+        //Return first of the table with this url https://localhost:44329/First
+        [HttpGet("/First")]
+        //0. public ActionResult<Author> GetFirstAuthor()
+        //1. Applicated async method
+        public async Task <ActionResult<Author>> GetFirstAuthor()
+        {
+
+            //0. return context.Authors.FirstOrDefault();
+            return await context.Authors.FirstOrDefaultAsync();
+        }
+
+
         //Bring all authors
         //https://localhost:44329/api/Authors
         [HttpGet]
@@ -34,10 +49,25 @@ namespace WebApiBookLibrary.Controllers
         }
 
         //Bring all author speific
-        //you can call this method through the name GetAuthor return new CreatedAtRouteResult("GetAuthor", new { id = author.Id},author);
-        //https://localhost:44329/api/Authors/1
-        [HttpGet("{id}",Name ="GetAuthor")]
-        public ActionResult<Author> Get(int id)
+        //1. you can call this method through the name GetAuthor return new CreatedAtRouteResult("GetAuthor", new { id = author.Id},author);
+        //1. https://localhost:44329/api/Authors/1
+        //1. [HttpGet("{id}",Name ="GetAuthor")]
+        //2. Bring author by id and ask a second variable to show the endpoint
+        //2. https://localhost:44329/api/Authors/2/juan
+        //2. [HttpGet("{id}/{param}")]
+        //3. Bring author by id and ask a second variable to show the endpoint but the second is no mandatory
+        //3. [HttpGet("{id}/{param?}")]
+        //4. is the second variable is empty put value gavilan en the variable param
+        //5. [HttpGet("{id}/{param=gavilan}")]
+        //1. public ActionResult<Author> Get(int id)
+        //0. public ActionResult<Author> Get(int id,string param)
+        //5. return actions inherated and type of data
+        //5. public IActionResult Get(int id,string param)
+        //6. Use Binder to get data through the url
+        //6. https://localhost:44329/api/Authors/3/?param=word
+        [HttpGet("{id}")]
+        //5. public Author Get(int id, string param)
+        public Author Get(int id,[BindRequired] string param)
         {
 
             var author = context.Authors.Include(x => x.Books).FirstOrDefault(x => x.Id == id);
@@ -45,13 +75,13 @@ namespace WebApiBookLibrary.Controllers
             //return simple
             //var author = context.Authors.FirstOrDefault(x => x.Id == id);
 
-            if (author == null)
-            {
-                return NotFound();
-            }
+            //0.if (author == null)
+            //0. {
+            //0.    return NotFound();
+            //0.}
 
+            //5. return Ok(author);
             return author;
-
         }
 
         //Add new Author and it return the author calling the method Get through GetAuthor and sending the name of the object created
