@@ -90,6 +90,8 @@ namespace WebApiBookLibrary.Controllers
         [HttpPost]
         public ActionResult Post([FromBody] Author author)
         {
+            //To revalidate the model
+            ///TryValidateModel(author);
             context.Authors.Add(author);
             context.SaveChanges();
             return new CreatedAtRouteResult("GetAuthor", new { id = author.Id},author);
