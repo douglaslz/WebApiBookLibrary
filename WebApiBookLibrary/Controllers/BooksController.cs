@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using WebApiBookLibrary.Context;
 using WebApiBookLibrary.Entities;
+using WebApiBookLibrary.Services;
 
 namespace WebApiBookLibrary.Controllers
 {
@@ -14,10 +15,14 @@ namespace WebApiBookLibrary.Controllers
     public class BooksController : ControllerBase
     {
         private readonly ApplicationDBContext context;
+        //Services test
+        private readonly IClaseB claseB;
 
-        public BooksController(ApplicationDBContext context)
+        public BooksController(ApplicationDBContext context, IClaseB claseB)
         {
             this.context = context;
+            //test services
+            this.claseB = claseB;
         }
 
         //Return all the books
@@ -25,6 +30,8 @@ namespace WebApiBookLibrary.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<Book>> Get()
         {
+            //Test services
+            //claseB.todosomething();
             return context.Books.Include(x => x.author).ToList();
             // Return the list of book 
             //return context.Books.ToList();

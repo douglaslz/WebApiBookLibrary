@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -12,6 +13,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using WebApiBookLibrary.Context;
+using WebApiBookLibrary.Helpers;
+using WebApiBookLibrary.Services;
 
 namespace WebApiBookLibrary
 {
@@ -27,10 +30,24 @@ namespace WebApiBookLibrary
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddScoped<MyActionFilter>();
+            //services to save information in cache
+            services.AddResponseCaching();
+            //filter authentication
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer();
+            //Use services in the clasesB
+            services.AddTransient<IClaseB, ClaseB2>();
             //confiruration of the database and dbcontext
             services.AddDbContext<ApplicationDBContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnectionString")));
-            // confiration of the version and the loop problem of loop references 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2).AddJsonOptions(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+            // 
+            services.AddMvc(options => 
+            {
+                //Configuration of filter of exception
+                options.Filters.Add(new MyExceptionFilter());
+            }
+            )
+                // confiration of the version and the loop problem of loop references 
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2).AddJsonOptions(options => options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
 
             
 
@@ -50,6 +67,9 @@ namespace WebApiBookLibrary
             }
 
             app.UseHttpsRedirection();
+            app.UseResponseCaching();
+            //Adding authorize for a resource in filters
+            app.UseAuthentication();
             app.UseMvc();
         }
     }

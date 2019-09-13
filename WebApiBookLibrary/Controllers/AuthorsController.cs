@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using WebApiBookLibrary.Context;
 using WebApiBookLibrary.Entities;
+using WebApiBookLibrary.Helpers;
 
 namespace WebApiBookLibrary.Controllers
 {
@@ -39,13 +40,19 @@ namespace WebApiBookLibrary.Controllers
 
         //Bring all authors
         //https://localhost:44329/api/Authors
+        [HttpGet("List")]
+        [HttpGet("/List")]
         [HttpGet]
+        [ServiceFilter(typeof(MyActionFilter))
+            ]
         public ActionResult<IEnumerable<Author>> Get()
         {
+            //Test the filter of exeption
+            //throw new NotImplementedException();
             //return all author with their books
-            return context.Authors.Include(x => x.Books).ToList();
+            //return context.Authors.Include(x => x.Books).ToList();
             //return all author
-            //return context.Authors.ToList();
+            return context.Authors.ToList();
         }
 
         //Bring all author speific
